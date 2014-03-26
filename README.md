@@ -16,6 +16,6 @@ SOCKS5
 Usage
 =======
 
-shadowsocks-auto-go -c auth.json
+shadowsocks-auth-go -c auth.json
 
 
