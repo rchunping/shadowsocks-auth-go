@@ -1,12 +1,14 @@
 package main
 
-import "os"
-import "io"
-import "net"
-import "log"
-import "sync"
-import "flag"
-import "encoding/json"
+import (
+	"encoding/json"
+	"flag"
+	"io"
+	"log"
+	"net"
+	"os"
+	//"sync"
+)
 
 var LISTEN string
 var SERVER string
@@ -21,9 +23,10 @@ func handleConnection(c net.Conn) {
 	var support, allow bool
 	var s net.Conn
 	var err error
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 
 	buf := make([]byte, 1500)
+	iodone := make(chan int, 2)
 
 	defer c.Close()
 
@@ -122,18 +125,21 @@ func handleConnection(c net.Conn) {
 	}
 
 	// loop read/write
-	wg.Add(1)
+	//wg.Add(1)
 	go func() {
 		io.Copy(c, s)
-		wg.Done()
+		iodone <- 1
+		//wg.Done()
 	}()
-	wg.Add(1)
+	//wg.Add(1)
 	go func() {
 		io.Copy(s, c)
-		wg.Done()
+		iodone <- 1
+		//wg.Done()
 	}()
 
-	wg.Wait()
+	<-iodone
+	//wg.Wait()
 	return
 
 cerr:
